@@ -1,0 +1,13 @@
+streamlit
+pandas
+numpy
+joblib
+requests
+plotly
+matminer
+pymatgen
+chromadb
+sentence-transformers
+xgboost
+supabase
+python-dotenv

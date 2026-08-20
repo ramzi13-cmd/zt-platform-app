@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Graph Digitizer</title>
+<style>
+  :root{
+    --ink:#12181f; --ink-2:#3a4653; --line:#d5dbe2; --line-2:#e8ecf1;
+    --bg:#f6f8fa; --panel:#ffffff; --accent:#0e8f8a; --accent-2:#0b6f6b;
+    --warn:#c65a2e; --xcol:#2563eb; --ycol:#c0392b; --pt:#0e8f8a;
+    --mono:'SFMono-Regular',ui-monospace,'JetBrains Mono',Menlo,Consolas,monospace;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:var(--sans); color:var(--ink); background:var(--bg);
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+  }
+  header{
+    display:flex; align-items:baseline; gap:14px; padding:12px 18px;
+    border-bottom:1px solid var(--line); background:var(--panel);
+  }
+  header h1{font-size:15px; font-weight:650; letter-spacing:.2px; margin:0}
+  header .sub{font-size:12px; color:var(--ink-2)}
+  .wrap{display:flex; flex:1; min-height:0}
+  /* stage */
+  .stage{
+    flex:1; position:relative; min-width:0; background:
+      linear-gradient(90deg,var(--line-2) 1px,transparent 1px) 0 0/22px 22px,
+      linear-gradient(0deg,var(--line-2) 1px,transparent 1px) 0 0/22px 22px,
+      #fbfcfd;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  #canvas{cursor:crosshair; box-shadow:0 2px 18px rgba(20,30,45,.12); background:#fff}
+  .drop{
+    position:absolute; inset:24px; border:2px dashed var(--line); border-radius:10px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:10px; color:var(--ink-2); text-align:center; pointer-events:none;
+  }
+  .drop.hide{display:none}
+  .drop strong{color:var(--ink); font-size:15px}
+  .drop .k{font-family:var(--mono); font-size:11px; background:#eef1f4; padding:2px 6px; border-radius:4px}
+  #loupe{
+    position:absolute; width:132px; height:132px; border-radius:50%;
+    border:2px solid var(--ink); box-shadow:0 4px 16px rgba(0,0,0,.25);
+    pointer-events:none; display:none; z-index:20; background:#fff; overflow:hidden;
+  }
+  #loupe canvas{display:block}
+  #loupe .cx{position:absolute; inset:0; pointer-events:none}
+  /* panel */
+  .panel{
+    width:340px; flex:0 0 340px; border-left:1px solid var(--line);
+    background:var(--panel); overflow-y:auto; padding:0;
+  }
+  .sec{padding:14px 16px; border-bottom:1px solid var(--line-2)}
+  .sec h2{
+    font-size:11px; text-transform:uppercase; letter-spacing:.9px; color:var(--ink-2);
+    margin:0 0 10px; font-weight:650; display:flex; align-items:center; gap:8px;
+  }
+  .sec h2 .n{
+    width:17px;height:17px;border-radius:50%;background:var(--ink);color:#fff;
+    font-family:var(--mono); font-size:10px; display:flex;align-items:center;justify-content:center;
+  }
+  .row{display:flex; gap:8px; align-items:center; margin-bottom:8px}
+  .row:last-child{margin-bottom:0}
+  label.lbl{font-size:12px; color:var(--ink-2); min-width:64px}
+  input[type=text],input[type=number]{
+    font-family:var(--mono); font-size:12px; padding:6px 8px; border:1px solid var(--line);
+    border-radius:6px; width:100%; color:var(--ink); background:#fff;
+  }
+  input:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(14,143,138,.12)}
+  .btn{
+    font-family:var(--sans); font-size:12px; font-weight:550; padding:7px 11px;
+    border:1px solid var(--line); border-radius:7px; background:#fff; color:var(--ink);
+    cursor:pointer; transition:.12s; white-space:nowrap;
+  }
+  .btn:hover{border-color:var(--ink-2)}
+  .btn.on{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .btn.acc{background:var(--accent); color:#fff; border-color:var(--accent)}
+  .btn.acc:hover{background:var(--accent-2)}
+  .btn.sm{padding:5px 8px; font-size:11px}
+  .btn:disabled{opacity:.4; cursor:not-allowed}
+  .modes{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+  .cal-grid{display:grid; grid-template-columns:auto 1fr auto; gap:6px 8px; align-items:center}
+  .cal-grid .tag{font-family:var(--mono); font-size:11px; font-weight:650}
+  .cal-grid .tag.x{color:var(--xcol)} .cal-grid .tag.y{color:var(--ycol)}
+  .pick{
+    font-size:11px; padding:4px 7px; border-radius:6px; border:1px solid var(--line);
+    background:#fff; cursor:pointer; font-family:var(--mono); color:var(--ink-2); white-space:nowrap;
+  }
+  .pick.set{color:var(--accent); border-color:var(--accent)}
+  .pick.active{background:var(--ink); color:#fff; border-color:var(--ink)}
+  .scale-toggle{display:flex; gap:4px}
+  .scale-toggle .btn{flex:1; text-align:center}
+  .hint{font-size:11px; color:var(--ink-2); line-height:1.5; margin-top:8px}
+  table{width:100%; border-collapse:collapse; font-family:var(--mono); font-size:11px}
+  th{text-align:right; color:var(--ink-2); font-weight:600; padding:4px 6px; border-bottom:1px solid var(--line); font-size:10px}
+  th:first-child{text-align:center}
+  td{text-align:right; padding:3px 6px; border-bottom:1px solid var(--line-2)}
+  td:first-child{text-align:center; color:var(--ink-2)}
+  .tbl-wrap{max-height:210px; overflow-y:auto; border:1px solid var(--line-2); border-radius:6px}
+  .empty-tbl{padding:16px; text-align:center; color:var(--ink-2); font-size:12px}
+  .del{color:var(--warn); cursor:pointer; border:none; background:none; font-size:13px; padding:0 4px}
+  .status{font-size:11px; color:var(--ink-2); padding:8px 16px; border-top:1px solid var(--line);
+    background:var(--panel); font-family:var(--mono); min-height:31px; display:flex; align-items:center}
+  .status b{color:var(--accent); font-weight:600}
+  .flex{display:flex; gap:8px}
+  .grow{flex:1}
+  input[type=file]{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>Graph Digitizer</h1>
+  <span class="sub">Load a plot image → calibrate the axes → click points → export data.</span>
+</header>
+
+<div class="wrap">
+  <div class="stage" id="stage">
+    <canvas id="canvas" width="10" height="10"></canvas>
+    <div class="drop" id="drop">
+      <strong>Drop a graph image here</strong>
+      <div>or click <span class="k">Load image</span> · paste from clipboard <span class="k">Ctrl/⌘ V</span></div>
+    </div>
+    <div id="loupe"><canvas id="loupeCv" width="132" height="132"></canvas>
+      <svg class="cx" viewBox="0 0 132 132"><line x1="66" y1="0" x2="66" y2="132" stroke="#e2342e" stroke-width="1"/><line x1="0" y1="66" x2="132" y2="66" stroke="#e2342e" stroke-width="1"/></svg>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="sec">
+      <h2><span class="n">1</span>Image</h2>
+      <div class="flex">
+        <button class="btn grow" id="loadBtn">Load image</button>
+        <button class="btn" id="clearImg" disabled>Reset</button>
+      </div>
+      <input type="file" id="file" accept="image/*">
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">2</span>Calibrate axes</h2>
+      <div class="cal-grid">
+        <span class="tag x">X1</span>
+        <input type="number" id="x1v" placeholder="value at X1" step="any">
+        <button class="pick" data-ref="x1">pick</button>
+        <span class="tag x">X2</span>
+        <input type="number" id="x2v" placeholder="value at X2" step="any">
+        <button class="pick" data-ref="x2">pick</button>
+        <span class="tag y">Y1</span>
+        <input type="number" id="y1v" placeholder="value at Y1" step="any">
+        <button class="pick" data-ref="y1">pick</button>
+        <span class="tag y">Y2</span>
+        <input type="number" id="y2v" placeholder="value at Y2" step="any">
+        <button class="pick" data-ref="y2">pick</button>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <label class="lbl">X scale</label>
+        <div class="scale-toggle grow">
+          <button class="btn sm on" data-scale="x" data-type="linear">Linear</button>
+          <button class="btn sm" data-scale="x" data-type="log">Log₁₀</button>
+        </div>
+      </div>
+      <div class="row">
+        <label class="lbl">Y scale</label>
+        <div class="scale-toggle grow">
+          <button class="btn sm on" data-scale="y" data-type="linear">Linear</button>
+          <button class="btn sm" data-scale="y" data-type="log">Log₁₀</button>
+        </div>
+      </div>
+      <div class="hint">Pick two points on each axis at known values. For X use the axis's x-position; for Y use its y-position. Assumes the axes are aligned with the image (rotate the image first if it's skewed).</div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">3</span>Pick data points</h2>
+      <div class="modes">
+        <button class="btn on" id="addMode">＋ Add points</button>
+        <button class="btn" id="delMode">✕ Delete point</button>
+      </div>
+      <div class="hint" id="pickHint">Calibrate all four references first, then click along your curve.</div>
+    </div>
+
+    <div class="sec">
+      <h2><span class="n">4</span>Data <span style="margin-left:auto;font-family:var(--mono);color:var(--ink-2)" id="ptCount">0 pts</span></h2>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>#</th><th>X</th><th>Y</th><th></th></tr></thead>
+          <tbody id="tbody"><tr><td colspan="4" class="empty-tbl">No points yet</td></tr></tbody>
+        </table>
+      </div>
+      <div class="flex" style="margin-top:10px">
+        <button class="btn acc grow" id="copyBtn" disabled>Copy CSV</button>
+        <button class="btn grow" id="dlBtn" disabled>Download CSV</button>
+        <button class="btn" id="clrPts" disabled>Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="status" id="status">Load a graph image to begin.</div>
+
+<script>
+(() => {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const loupe = document.getElementById('loupe');
+  const loupeCv = document.getElementById('loupeCv');
+  const lctx = loupeCv.getContext('2d');
+  const stage = document.getElementById('stage');
+  const status = document.getElementById('status');
+  const drop = document.getElementById('drop');
+
+  let img = null;               // Image element
+  let view = {scale:1, w:0, h:0};// display scale (natural->display)
+  // calibration refs store point in NATURAL image pixels
+  const refs = { x1:null, x2:null, y1:null, y2:null };
+  const scaleType = { x:'linear', y:'linear' };
+  let points = [];              // {px,py} in natural pixels
+  let mode = 'add';             // 'add' | 'del'
+  let pickRef = null;           // which ref we're placing, or null
+  let hover = null;             // {x,y} display coords
+
+  const REF_COLORS = {x1:'#2563eb', x2:'#2563eb', y1:'#c0392b', y2:'#c0392b'};
+
+  /* ---------- image loading ---------- */
+  function loadImage(src){
+    const im = new Image();
+    im.onload = () => {
+      img = im;
+      fitView();
+      resetCalibration();
+      points = [];
+      drop.classList.add('hide');
+      document.getElementById('clearImg').disabled = false;
+      draw(); refreshTable(); setStatus();
+    };
+    im.src = src;
+  }
+  function fitView(){
+    const pad = 40;
+    const availW = stage.clientWidth - pad;
+    const availH = stage.clientHeight - pad;
+    const s = Math.min(availW/img.width, availH/img.height, 1);
+    view.scale = s;
+    view.w = Math.round(img.width * s);
+    view.h = Math.round(img.height * s);
+    canvas.width = view.w; canvas.height = view.h;
+  }
+  document.getElementById('loadBtn').onclick = () => document.getElementById('file').click();
+  document.getElementById('file').onchange = e => {
+    const f = e.target.files[0]; if(!f) return;
+    const r = new FileReader(); r.onload = ev => loadImage(ev.target.result); r.readAsDataURL(f);
+  };
+  document.getElementById('clearImg').onclick = () => location.reload();
+
+  // drag & drop
+  ['dragover','dragenter'].forEach(ev=>stage.addEventListener(ev,e=>{e.preventDefault();}));
+  stage.addEventListener('drop', e=>{
+    e.preventDefault();
+    const f = [...e.dataTransfer.files].find(f=>f.type.startsWith('image/'));
+    if(f){const r=new FileReader(); r.onload=ev=>loadImage(ev.target.result); r.readAsDataURL(f);}
+  });
+  // paste
+  window.addEventListener('paste', e=>{
+    const it = [...e.clipboardData.items].find(i=>i.type.startsWith('image/'));
+    if(it){const f=it.getAsFile(); const r=new FileReader(); r.onload=ev=>loadImage(ev.target.result); r.readAsDataURL(f);}
+  });
+
+  /* ---------- coord helpers ---------- */
+  // display px -> natural px
+  const toNat = (dx,dy) => ({px: dx/view.scale, py: dy/view.scale});
+  // natural px -> display px
+  const toDisp = (px,py) => ({x: px*view.scale, y: py*view.scale});
+
+  function calibrated(){ return refs.x1&&refs.x2&&refs.y1&&refs.y2; }
+
+  function mapAxis(pix, p1, v1, p2, v2, type){
+    // pix, p1, p2 in the relevant pixel dimension
+    const t = (pix - p1)/(p2 - p1);
+    if(type==='log'){
+      const l1=Math.log10(v1), l2=Math.log10(v2);
+      return Math.pow(10, l1 + t*(l2-l1));
+    }
+    return v1 + t*(v2 - v1);
+  }
+
+  function dataFor(px,py){
+    const xv1=parseFloat(x1v.value), xv2=parseFloat(x2v.value);
+    const yv1=parseFloat(y1v.value), yv2=parseFloat(y2v.value);
+    if([xv1,xv2,yv1,yv2].some(isNaN)) return null;
+    const X = mapAxis(px, refs.x1.px, xv1, refs.x2.px, xv2, scaleType.x);
+    const Y = mapAxis(py, refs.y1.py, yv1, refs.y2.py, yv2, scaleType.y);
+    return {X, Y};
+  }
+  const x1v=document.getElementById('x1v'), x2v=document.getElementById('x2v');
+  const y1v=document.getElementById('y1v'), y2v=document.getElementById('y2v');
+
+  /* ---------- drawing ---------- */
+  function draw(){
+    if(!img) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(img,0,0,view.w,view.h);
+
+    // calibration guide lines
+    ctx.save();
+    ['x1','x2'].forEach(k=>{ if(refs[k]){const d=toDisp(refs[k].px,refs[k].py);
+      ctx.strokeStyle='rgba(37,99,235,.5)'; ctx.setLineDash([5,4]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(d.x,0); ctx.lineTo(d.x,view.h); ctx.stroke(); }});
+    ['y1','y2'].forEach(k=>{ if(refs[k]){const d=toDisp(refs[k].px,refs[k].py);
+      ctx.strokeStyle='rgba(192,57,43,.5)'; ctx.setLineDash([5,4]); ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(0,d.y); ctx.lineTo(view.w,d.y); ctx.stroke(); }});
+    ctx.setLineDash([]);
+    // ref markers
+    Object.keys(refs).forEach(k=>{ if(refs[k]){const d=toDisp(refs[k].px,refs[k].py);
+      ctx.fillStyle=REF_COLORS[k]; ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(d.x,d.y,5,0,7); ctx.fill(); ctx.stroke();
+      ctx.fillStyle=REF_COLORS[k]; ctx.font='700 10px monospace';
+      ctx.fillText(k.toUpperCase(), d.x+8, d.y-6); }});
+    ctx.restore();
+
+    // data points
+    points.forEach((p,i)=>{ const d=toDisp(p.px,p.py);
+      ctx.fillStyle='rgba(14,143,138,.9)'; ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.arc(d.x,d.y,4.5,0,7); ctx.fill(); ctx.stroke();
+    });
+  }
+
+  /* ---------- loupe ---------- */
+  function updateLoupe(dx,dy,clientX,clientY){
+    if(!img){loupe.style.display='none';return;}
+    loupe.style.display='block';
+    const rect = stage.getBoundingClientRect();
+    let lx = clientX - rect.left + 18, ly = clientY - rect.top - 150;
+    if(lx+132 > stage.clientWidth) lx = clientX-rect.left-150;
+    if(ly < 0) ly = clientY - rect.top + 18;
+    loupe.style.left = lx+'px'; loupe.style.top = ly+'px';
+    const nat = toNat(dx,dy);
+    const Z = 6, half = 132/(2*Z);
+    lctx.imageSmoothingEnabled=false;
+    lctx.clearRect(0,0,132,132);
+    lctx.drawImage(img, nat.px-half, nat.py-half, half*2, half*2, 0,0,132,132);
+  }
+
+  /* ---------- interaction ---------- */
+  function evtPos(e){
+    const r = canvas.getBoundingClientRect();
+    return {x:e.clientX-r.left, y:e.clientY-r.top};
+  }
+  canvas.addEventListener('mousemove', e=>{
+    if(!img) return;
+    const p = evtPos(e); hover=p;
+    updateLoupe(p.x,p.y,e.clientX,e.clientY);
+  });
+  canvas.addEventListener('mouseleave', ()=>{loupe.style.display='none'; hover=null;});
+
+  canvas.addEventListener('click', e=>{
+    if(!img) return;
+    const p = evtPos(e);
+    const nat = toNat(p.x,p.y);
+    if(pickRef){
+      refs[pickRef] = nat;
+      document.querySelector(`.pick[data-ref="${pickRef}"]`).classList.add('set');
+      document.querySelectorAll('.pick').forEach(b=>b.classList.remove('active'));
+      pickRef=null; draw(); setStatus(); refreshTable();
+      return;
+    }
+    if(mode==='add'){
+      if(!calibrated()){ flashStatus('Set X1, X2, Y1, Y2 before picking data points.'); return; }
+      points.push(nat); draw(); refreshTable();
+    } else if(mode==='del'){
+      // find nearest within 12 display px
+      let best=-1, bd=12;
+      points.forEach((pt,i)=>{const d=toDisp(pt.px,pt.py); const dist=Math.hypot(d.x-p.x,d.y-p.y); if(dist<bd){bd=dist;best=i;}});
+      if(best>=0){ points.splice(best,1); draw(); refreshTable(); }
+    }
+    setStatus();
+  });
+
+  // pick ref buttons
+  document.querySelectorAll('.pick').forEach(b=>{
+    b.onclick = () => {
+      if(!img){ flashStatus('Load an image first.'); return; }
+      document.querySelectorAll('.pick').forEach(x=>x.classList.remove('active'));
+      pickRef = b.dataset.ref; b.classList.add('active');
+      setStatus();
+    };
+  });
+  // scale toggles
+  document.querySelectorAll('[data-scale]').forEach(b=>{
+    b.onclick = () => {
+      const ax=b.dataset.scale;
+      document.querySelectorAll(`[data-scale="${ax}"]`).forEach(x=>x.classList.remove('on'));
+      b.classList.add('on'); scaleType[ax]=b.dataset.type; refreshTable();
+    };
+  });
+  // modes
+  const addBtn=document.getElementById('addMode'), delBtn=document.getElementById('delMode');
+  addBtn.onclick=()=>{mode='add'; addBtn.classList.add('on'); delBtn.classList.remove('on'); setStatus();};
+  delBtn.onclick=()=>{mode='del'; delBtn.classList.add('on'); addBtn.classList.remove('on'); setStatus();};
+
+  // value inputs -> recompute
+  [x1v,x2v,y1v,y2v].forEach(inp=>inp.addEventListener('input',refreshTable));
+
+  /* ---------- table + export ---------- */
+  function fmt(n){
+    if(!isFinite(n)) return '—';
+    const a=Math.abs(n);
+    if(a!==0 && (a<1e-3 || a>=1e6)) return n.toExponential(3);
+    return (Math.round(n*1e4)/1e4).toString();
+  }
+  function computed(){
+    return points.map(p=>({p, d:dataFor(p.px,p.py)}));
+  }
+  function refreshTable(){
+    const rows = computed();
+    const tb=document.getElementById('tbody');
+    document.getElementById('ptCount').textContent = points.length+' pts';
+    if(rows.length===0){ tb.innerHTML='<tr><td colspan="4" class="empty-tbl">No points yet</td></tr>'; }
+    else {
+      tb.innerHTML = rows.map((r,i)=>{
+        const x = r.d? fmt(r.d.X):'—', y = r.d? fmt(r.d.Y):'—';
+        return `<tr><td>${i+1}</td><td>${x}</td><td>${y}</td><td><button class="del" data-i="${i}">×</button></td></tr>`;
+      }).join('');
+      tb.querySelectorAll('.del').forEach(b=>b.onclick=()=>{points.splice(+b.dataset.i,1);draw();refreshTable();setStatus();});
+    }
+    const has = rows.length>0 && rows.every(r=>r.d);
+    document.getElementById('copyBtn').disabled=!has;
+    document.getElementById('dlBtn').disabled=!has;
+    document.getElementById('clrPts').disabled=points.length===0;
+    document.getElementById('pickHint').textContent = calibrated()
+      ? 'Click along your curve. Use the loupe for precision. Switch to Delete to remove a point.'
+      : 'Calibrate all four references first, then click along your curve.';
+    draw();
+  }
+  function csv(){
+    return 'x,y\n' + computed().filter(r=>r.d).map(r=>`${r.d.X},${r.d.Y}`).join('\n');
+  }
+  document.getElementById('copyBtn').onclick=()=>{
+    navigator.clipboard.writeText(csv()).then(()=>flashStatus('CSV copied to clipboard.'));
+  };
+  document.getElementById('dlBtn').onclick=()=>{
+    const blob=new Blob([csv()],{type:'text/csv'}); const u=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=u; a.download='digitized_data.csv'; a.click(); URL.revokeObjectURL(u);
+  };
+  document.getElementById('clrPts').onclick=()=>{points=[]; draw(); refreshTable(); setStatus();};
+
+  /* ---------- status ---------- */
+  let flashT=null;
+  function flashStatus(msg){ status.innerHTML=msg; clearTimeout(flashT); flashT=setTimeout(setStatus,2200); }
+  function setStatus(){
+    if(!img){status.textContent='Load a graph image to begin.'; return;}
+    if(pickRef){status.innerHTML=`Click the plot to place <b>${pickRef.toUpperCase()}</b>.`; return;}
+    const done = Object.values(refs).filter(Boolean).length;
+    if(done<4){ status.innerHTML=`Calibration: <b>${done}/4</b> references set.`; return; }
+    status.innerHTML = `Ready · <b>${points.length}</b> point${points.length!==1?'s':''} · X ${scaleType.x} · Y ${scaleType.y}`;
+  }
+
+  function resetCalibration(){
+    ['x1','x2','y1','y2'].forEach(k=>refs[k]=null);
+    document.querySelectorAll('.pick').forEach(b=>b.classList.remove('set','active'));
+    pickRef=null;
+  }
+
+  window.addEventListener('resize', ()=>{ if(img){fitView(); draw();} });
+})();
+</script>
+</body>
+</html>
