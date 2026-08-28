@@ -40,6 +40,14 @@ except ImportError:
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_PUBLISHABLE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "")
 
+# --- TEMPORARY DEBUG — remove after diagnosing ---
+st.write("DEBUG SUPABASE_URL repr:", repr(SUPABASE_URL))
+st.write("DEBUG SUPABASE_URL length:", len(SUPABASE_URL))
+st.write("DEBUG KEY first 25 chars repr:", repr(SUPABASE_PUBLISHABLE_KEY[:25]))
+st.write("DEBUG KEY last 10 chars repr:", repr(SUPABASE_PUBLISHABLE_KEY[-10:]))
+st.write("DEBUG KEY length:", len(SUPABASE_PUBLISHABLE_KEY))
+# --- END TEMPORARY DEBUG ---
+
 @st.cache_resource
 def get_supabase_client():
     if create_client is None or not SUPABASE_URL or not SUPABASE_PUBLISHABLE_KEY:
@@ -293,7 +301,7 @@ with st.sidebar:
     st.markdown(f"**Dataset:** {n_rows:,} rows")
     st.markdown(f"**Unique compositions:** {n_comps}")
     st.markdown(f"**DOI-linked rows:** {n_dois:,}")
-    if model_loaded: st.markdown("**Model:** XGBoost (R²=0.966) ✅")
+    if model_loaded: st.markdown("**Model:** XGBoost (R²=0.962) ✅")
     else:            st.markdown("**Model:** Not loaded ⚠️")
     st.markdown("---")
     st.markdown("NTNU · Dept. of Mechanical & Industrial Engineering")
@@ -636,14 +644,14 @@ else:
 # ══════════════════════════════════════════════════════════════
 if page == "🏠  Overview":
     st.markdown("# Thermoelectric ZT Prediction Platform")
-    st.markdown('<div class="info-box">A machine learning platform for predicting and screening thermoelectric figure of merit (ZT) across diverse material families. Trained on 3,841 data points from 314 unique compositions using matminer Magpie elemental descriptors. Best model: XGBoost (R²=0.966 random split, R²=0.829 composition-grouped).</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-box">A machine learning platform for predicting and screening thermoelectric figure of merit (ZT) across diverse material families. Trained on 3,841 data points from 314 unique compositions using matminer Magpie elemental descriptors. Deployed model: XGBoost (R²=0.962 random split, R²=0.798 composition-grouped).</div>', unsafe_allow_html=True)
 
     c1,c2,c3,c4 = st.columns(4)
     for col,(val,label) in zip([c1,c2,c3,c4],[
         ("3,841","Total Data Points"),
         ("314","Unique Compositions"),
         ("62","Published Papers"),
-        ("0.829","Grouped CV R²"),
+        ("0.820","Grouped CV R²"),
     ]):
         col.markdown(f'<div class="stat-card"><div class="stat-value">{val}</div><div class="stat-label">{label}</div></div>', unsafe_allow_html=True)
 
@@ -979,22 +987,22 @@ elif page == "📊  Model Performance":
 
     c1,c2,c3,c4 = st.columns(4)
     for col,(val,label) in zip([c1,c2,c3,c4],[
-        ("0.966","Best R² — Random split"),
-        ("0.831","Best R² — Grouped CV"),
+        ("0.962","Best R² — Random split"),
+        ("0.820","Best R² — Grouped CV"),
         ("5","Models Benchmarked"),
-        ("133","Magpie Features"),
+        ("132","Magpie Features"),
     ]):
         col.markdown(f'<div class="stat-card"><div class="stat-value">{val}</div><div class="stat-label">{label}</div></div>', unsafe_allow_html=True)
 
     dm_random = pd.DataFrame({
         'Model':   ['XGBoost','RandomForest','GradientBoosting','LightGBM','SVR'],
-        'R2_mean': [0.966,    0.963,          0.957,             0.952,     0.879],
-        'R2_std':  [0.004,    0.006,          0.007,             0.005,     0.012],
+        'R2_mean': [0.962,    0.961,          0.956,             0.952,     0.876],
+        'R2_std':  [0.009,    0.010,          0.009,             0.013,     0.015],
     })
     dm_grouped = pd.DataFrame({
-        'Model':   ['GradientBoosting','XGBoost','RandomForest','LightGBM','SVR'],
-        'R2_mean': [0.831,              0.829,    0.821,          0.821,    0.734],
-        'R2_std':  [0.030,              0.027,    0.024,          0.040,    0.051],
+        'Model':   ['GradientBoosting','LightGBM','RandomForest','XGBoost','SVR'],
+        'R2_mean': [0.820,              0.810,     0.802,         0.798,    0.683],
+        'R2_std':  [0.012,              0.029,     0.031,         0.042,    0.157],
     })
 
     tab1, tab2 = st.tabs(["Random Split (reference)", "Grouped CV (honest)"])
