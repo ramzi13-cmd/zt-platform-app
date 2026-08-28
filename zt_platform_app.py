@@ -40,14 +40,6 @@ except ImportError:
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
 SUPABASE_PUBLISHABLE_KEY = os.environ.get("SUPABASE_PUBLISHABLE_KEY", "")
 
-# --- TEMPORARY DEBUG — remove after diagnosing ---
-st.write("DEBUG SUPABASE_URL repr:", repr(SUPABASE_URL))
-st.write("DEBUG SUPABASE_URL length:", len(SUPABASE_URL))
-st.write("DEBUG KEY first 25 chars repr:", repr(SUPABASE_PUBLISHABLE_KEY[:25]))
-st.write("DEBUG KEY last 10 chars repr:", repr(SUPABASE_PUBLISHABLE_KEY[-10:]))
-st.write("DEBUG KEY length:", len(SUPABASE_PUBLISHABLE_KEY))
-# --- END TEMPORARY DEBUG ---
-
 @st.cache_resource
 def get_supabase_client():
     if create_client is None or not SUPABASE_URL or not SUPABASE_PUBLISHABLE_KEY:
