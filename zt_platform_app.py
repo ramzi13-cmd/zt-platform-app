@@ -108,7 +108,7 @@ st.set_page_config(
 
 PROJECT_DIR = './'
 DATA_PATH  = PROJECT_DIR + 'thermoelectric_dataset_magpie_v2.csv'
-MODEL_PATH = PROJECT_DIR + 'zt_xgboost_model.pkl'
+MODEL_PATH = PROJECT_DIR + 'zt_gradboost_model.pkl'
 FEAT_PATH  = PROJECT_DIR + 'feature_cols.pkl'
 SHAP_PATH  = PROJECT_DIR + 'shap_feature_importance.csv'
 
@@ -293,7 +293,7 @@ with st.sidebar:
     st.markdown(f"**Dataset:** {n_rows:,} rows")
     st.markdown(f"**Unique compositions:** {n_comps}")
     st.markdown(f"**DOI-linked rows:** {n_dois:,}")
-    if model_loaded: st.markdown("**Model:** XGBoost (R²=0.962) ✅")
+    if model_loaded: st.markdown("**Model:** Gradient Boosting (R²=0.820) ✅")
     else:            st.markdown("**Model:** Not loaded ⚠️")
     st.markdown("---")
     st.markdown("NTNU · Dept. of Mechanical & Industrial Engineering")
@@ -636,7 +636,7 @@ else:
 # ══════════════════════════════════════════════════════════════
 if page == "🏠  Overview":
     st.markdown("# Thermoelectric ZT Prediction Platform")
-    st.markdown('<div class="info-box">A machine learning platform for predicting and screening thermoelectric figure of merit (ZT) across diverse material families. Trained on 3,841 data points from 314 unique compositions using matminer Magpie elemental descriptors. Deployed model: XGBoost (R²=0.962 random split, R²=0.798 composition-grouped).</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-box">A machine learning platform for predicting and screening thermoelectric figure of merit (ZT) across diverse material families. Trained on 3,841 data points from 314 unique compositions using matminer Magpie elemental descriptors. Deployed model: Gradient Boosting (R²=0.956 random split, R²=0.820 composition-grouped — best of 5 algorithms benchmarked under honest, composition-grouped evaluation).</div>', unsafe_allow_html=True)
 
     c1,c2,c3,c4 = st.columns(4)
     for col,(val,label) in zip([c1,c2,c3,c4],[
@@ -651,7 +651,7 @@ if page == "🏠  Overview":
     c1,c2,c3 = st.columns(3)
     for col,(icon,title,desc) in zip([c1,c2,c3],[
         ("🔍","Data Explorer","Browse 3,841 ZT measurements. Filter by composition, ZT range, and temperature."),
-        ("🤖","ZT Prediction","Predict ZT for any composition at any temperature using XGBoost + matminer Magpie features."),
+        ("🤖","ZT Prediction","Predict ZT for any composition at any temperature using Gradient Boosting + matminer Magpie features."),
         ("⚗️","Composition Screening","Batch-screen multiple compositions and compare predicted ZT at a fixed temperature."),
     ]):
         col.markdown(f'<div style="background:white;border:1px solid #DDE3ED;border-radius:8px;padding:16px;height:120px;"><div style="font-size:1.5rem;">{icon}</div><div style="font-weight:600;color:#1B2A4A;margin-top:4px;">{title}</div><div style="font-size:0.83rem;color:#5A6478;margin-top:4px;">{desc}</div></div>', unsafe_allow_html=True)
@@ -765,10 +765,10 @@ elif page == "🔍  Data Explorer":
 elif page == "🤖  ZT Prediction":
     import plotly.graph_objects as go
     st.markdown("# ZT Prediction")
-    st.markdown('<div class="info-box">Enter any thermoelectric composition and temperature to predict ZT using the XGBoost model trained on matminer Magpie features.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-box">Enter any thermoelectric composition and temperature to predict ZT using the Gradient Boosting model trained on matminer Magpie features.</div>', unsafe_allow_html=True)
 
     if not model_loaded:
-        st.error("Model not loaded. Place zt_xgboost_model.pkl and feature_cols.pkl in the app folder.")
+        st.error("Model not loaded. Place zt_gradboost_model.pkl and feature_cols.pkl in the app folder.")
         st.stop()
 
     c1, c2 = st.columns([2, 1])
@@ -1542,7 +1542,7 @@ elif page == "💬  AI Assistant":
     AGENT_TOOL_SCHEMAS = [
         {"type": "function", "function": {
             "name": "predict_zt",
-            "description": "Predict ZT for a composition at a specific temperature using the trained XGBoost model.",
+            "description": "Predict ZT for a composition at a specific temperature using the trained Gradient Boosting model.",
             "parameters": {"type": "object", "properties": {
                 "composition": {"type": "string", "description": "Chemical formula, e.g. 'Bi2Te3'"},
                 "temperature": {"type": "number", "description": "Temperature in Kelvin"}},
