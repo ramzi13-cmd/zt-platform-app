@@ -1,134 +1,134 @@
 Feature,Mean_Abs_SHAP
-Temperature (K),0.19858243
-MagpieData avg_dev CovalentRadius,0.1574892
-MagpieData mean NValence,0.029943757
-MagpieData mean GSbandgap,0.027477983
-MagpieData avg_dev AtomicWeight,0.014985496
-MagpieData avg_dev MendeleevNumber,0.014400804
-MagpieData mean GSvolume_pa,0.012955369
-MagpieData range NValence,0.0116588045
-MagpieData avg_dev SpaceGroupNumber,0.010367755
-MagpieData avg_dev Electronegativity,0.010015163
-MagpieData avg_dev Number,0.009874444
-MagpieData avg_dev NValence,0.0092143295
-MagpieData mean NdValence,0.008881604
-MagpieData mean Number,0.008309819
-MagpieData mean Column,0.007915664
-MagpieData avg_dev MeltingT,0.006983636
-MagpieData avg_dev NUnfilled,0.0068598427
-MagpieData mean CovalentRadius,0.0067081633
-MagpieData minimum NValence,0.006652708
-MagpieData mean SpaceGroupNumber,0.0061663343
-MagpieData mean NUnfilled,0.006052045
-MagpieData minimum MeltingT,0.005999268
-MagpieData range AtomicWeight,0.0058159074
-MagpieData mean NfValence,0.005526487
-MagpieData mean MendeleevNumber,0.0053256876
-MagpieData avg_dev GSvolume_pa,0.0051090135
-MagpieData maximum MeltingT,0.005015743
-MagpieData mean Electronegativity,0.004686255
-MagpieData mean NdUnfilled,0.004525988
-MagpieData minimum MendeleevNumber,0.004481518
-MagpieData mean MeltingT,0.004465485
-MagpieData minimum GSvolume_pa,0.0043970887
-MagpieData avg_dev Row,0.004126103
-MagpieData avg_dev NpUnfilled,0.004004048
-MagpieData avg_dev NdUnfilled,0.0039560352
-MagpieData range GSvolume_pa,0.003673377
-MagpieData range Number,0.0034856282
-MagpieData mode SpaceGroupNumber,0.003239027
-MagpieData range MendeleevNumber,0.003113194
-MagpieData minimum Number,0.0030673184
-MagpieData mean NpUnfilled,0.0030254764
-MagpieData maximum NdUnfilled,0.0029757572
-MagpieData mean Row,0.0029474453
-MagpieData avg_dev NpValence,0.0029358063
-MagpieData avg_dev GSbandgap,0.002890082
-MagpieData mode NdValence,0.0028413578
-MagpieData mean NpValence,0.002601894
-MagpieData maximum CovalentRadius,0.0025108869
-MagpieData range MeltingT,0.0022446718
-MagpieData minimum Electronegativity,0.00224081
-MagpieData maximum Number,0.0021187833
-MagpieData range SpaceGroupNumber,0.0020695976
-MagpieData minimum NdValence,0.0019903616
-MagpieData mode MendeleevNumber,0.0018712922
-MagpieData avg_dev GSmagmom,0.0017797237
-MagpieData range CovalentRadius,0.0017765657
-MagpieData mean AtomicWeight,0.001629783
-MagpieData maximum AtomicWeight,0.0015859841
-MagpieData avg_dev Column,0.0015433633
-MagpieData range NUnfilled,0.0013525013
-MagpieData minimum CovalentRadius,0.0012972129
-MagpieData range Electronegativity,0.0012901805
-MagpieData mode MeltingT,0.0012890918
-MagpieData mode Number,0.0011610518
-MagpieData avg_dev NdValence,0.0011397926
-MagpieData range Row,0.001046775
-MagpieData mean NfUnfilled,0.00096641004
-MagpieData maximum Electronegativity,0.0009016827
-MagpieData mean NsValence,0.00087670743
-MagpieData mode CovalentRadius,0.00086346554
-MagpieData mean GSmagmom,0.0006842003
-MagpieData maximum GSbandgap,0.0006527942
-MagpieData maximum MendeleevNumber,0.00059966906
-MagpieData maximum GSvolume_pa,0.0005528133
-MagpieData avg_dev NfValence,0.00044941084
-MagpieData mode GSvolume_pa,0.00041402463
-MagpieData maximum SpaceGroupNumber,0.00038724203
-MagpieData mode GSmagmom,0.00035692516
-MagpieData mode NValence,0.0002990168
-MagpieData maximum NfUnfilled,0.00023997936
-MagpieData minimum AtomicWeight,0.00020607363
-MagpieData maximum NValence,0.0001980473
-MagpieData range NpUnfilled,0.00017575933
-MagpieData mode Electronegativity,0.000121853904
-MagpieData minimum NUnfilled,0.00011786196
-MagpieData avg_dev NsValence,0.00010291334
-MagpieData minimum Column,8.0234415e-05
-MagpieData mode GSbandgap,7.8943434e-05
-MagpieData minimum NsValence,7.570894e-05
-MagpieData maximum NUnfilled,5.5018547e-05
-MagpieData maximum NpUnfilled,5.137941e-05
-MagpieData minimum SpaceGroupNumber,4.094518e-05
-MagpieData range NdValence,2.6495265e-05
-MagpieData mode Column,9.654785e-06
-MagpieData range NsValence,0.0
-MagpieData mode AtomicWeight,0.0
-MagpieData maximum Column,0.0
-MagpieData range Column,0.0
-MagpieData minimum Row,0.0
-MagpieData maximum Row,0.0
-MagpieData mode Row,0.0
-MagpieData maximum NfValence,0.0
-MagpieData minimum NfValence,0.0
-MagpieData maximum NdValence,0.0
-MagpieData mode NsValence,0.0
-MagpieData maximum NpValence,0.0
-MagpieData minimum NpValence,0.0
-MagpieData range NpValence,0.0
-MagpieData mode NpValence,0.0
-MagpieData maximum NsValence,0.0
-MagpieData range NfValence,0.0
-MagpieData minimum NsUnfilled,0.0
-MagpieData mode NfValence,0.0
-MagpieData range NsUnfilled,0.0
-MagpieData mean NsUnfilled,0.0
-MagpieData avg_dev NsUnfilled,0.0
-MagpieData maximum NsUnfilled,0.0
-MagpieData range NfUnfilled,0.0
-MagpieData minimum NfUnfilled,0.0
-MagpieData range NdUnfilled,0.0
-MagpieData mode NdUnfilled,0.0
-MagpieData mode NpUnfilled,0.0
-MagpieData minimum NpUnfilled,0.0
-MagpieData minimum NdUnfilled,0.0
-MagpieData mode NsUnfilled,0.0
-MagpieData minimum GSbandgap,0.0
-MagpieData mode NfUnfilled,0.0
-MagpieData avg_dev NfUnfilled,0.0
-MagpieData mode NUnfilled,0.0
-MagpieData range GSmagmom,0.0
-MagpieData maximum GSmagmom,0.0
-MagpieData minimum GSmagmom,0.0
-MagpieData range GSbandgap,0.0
+Temperature (K),0.20195459623024192
+Deviation in Covalent Radius,0.14878502452807407
+Average Total Valence Electrons,0.028058554321837105
+Average Ground-State Band Gap,0.025325866786107494
+Range of Total Valence Electrons,0.022397575820587
+Deviation in Mendeleev Number,0.021620011223630782
+Deviation in Electronegativity,0.013574913616015401
+Deviation in Atomic Weight,0.013277578376326695
+Average Periodic Table Group,0.010739221313658565
+Deviation in Space Group Number,0.010712038681495102
+Average d-Valence Electrons,0.01038171375904489
+Average Ground-State Volume per Atom,0.009147778397324061
+Deviation in Total Unfilled Orbital Electrons,0.008993684413227076
+Average Space Group Number,0.00872448177483866
+Deviation in Total Valence Electrons,0.008475702281663115
+Deviation in Atomic Number,0.008079408759179103
+Range of Ground-State Volume per Atom,0.0072036812284979775
+Minimum Melting Point,0.00705557906096528
+Average Mendeleev Number,0.00681673121440875
+Deviation in Ground-State Volume per Atom,0.006525347298089176
+Average Covalent Radius,0.006366679347982008
+Deviation in Melting Point,0.0062872309210386225
+Average Melting Point,0.005484963322800868
+Average Atomic Weight,0.005323300059602745
+Minimum Total Valence Electrons,0.005211371045039432
+Minimum Ground-State Volume per Atom,0.0045873389319713775
+Average Total Unfilled Orbital Electrons,0.004552119772596742
+Deviation in Unfilled d-Orbital Electrons,0.004508378924110146
+Range of Atomic Weight,0.0043180031201223495
+Maximum Melting Point,0.0041407239879865795
+Range of Melting Point,0.0040212442090596075
+Maximum Electronegativity,0.003530721385179412
+Most Common Space Group Number,0.003500642120191753
+Average Electronegativity,0.0034508834321442636
+Deviation in Periodic Table Period,0.0030915701461688796
+Average Unfilled p-Orbital Electrons,0.0030444649037800918
+Range of Atomic Number,0.002865388443295391
+Deviation in Ground-State Band Gap,0.0028059812542648526
+Average Atomic Number,0.0027980896694995406
+Deviation in d-Valence Electrons,0.00263419409454985
+Average p-Valence Electrons,0.0026086955140938927
+Minimum Covalent Radius,0.0023955184651793006
+Most Common Ground-State Volume per Atom,0.0023953941531648683
+Range of Mendeleev Number,0.002287618546244189
+Minimum Electronegativity,0.0021975051672495013
+Deviation in Unfilled p-Orbital Electrons,0.002115286370503579
+Average f-Valence Electrons,0.0020389735989736553
+Range of Unfilled d-Orbital Electrons,0.0020375592873636337
+Range of Space Group Number,0.0019026359470565195
+Most Common Total Valence Electrons,0.0018707210701228414
+Deviation in p-Valence Electrons,0.0018112348059017107
+Maximum Space Group Number,0.0015235391143463358
+Minimum Mendeleev Number,0.0015101748855686535
+Range of Electronegativity,0.0014963590300653164
+Most Common Mendeleev Number,0.0014246735075362819
+Range of Covalent Radius,0.0013331542259038482
+Range of Periodic Table Period,0.0013198762283160065
+Average Unfilled d-Orbital Electrons,0.0012880457025500512
+Range of Total Unfilled Orbital Electrons,0.0011844048171777747
+Average Unfilled s-Orbital Electrons,0.0011431098416585354
+Most Common Atomic Number,0.0011296753659449507
+Average Unfilled f-Orbital Electrons,0.0011139669192631511
+Range of d-Valence Electrons,0.0011112697973332086
+Maximum Covalent Radius,0.0010715950721487282
+Maximum Ground-State Volume per Atom,0.0010679509197227574
+Most Common Ground-State Magnetic Moment,0.00089065978150524
+Most Common d-Valence Electrons,0.0008843770603284025
+Range of Ground-State Band Gap,0.0008559754950872788
+Deviation in f-Valence Electrons,0.0008510842923619597
+Average Periodic Table Period,0.0008213479914286042
+Deviation in Ground-State Magnetic Moment,0.0007819195182939634
+Deviation in Periodic Table Group,0.0007702971396342776
+Most Common Melting Point,0.0007155975994920926
+Maximum Unfilled d-Orbital Electrons,0.0007116301957170045
+Minimum Space Group Number,0.0007014922661462851
+Average s-Valence Electrons,0.000674686067752109
+Maximum Total Unfilled Orbital Electrons,0.0005842211866882626
+Deviation in Unfilled f-Orbital Electrons,0.000580315339017156
+Maximum Atomic Number,0.0005730698007003663
+Most Common Ground-State Band Gap,0.0005579591136358666
+Most Common Covalent Radius,0.0004992038936952966
+Maximum Total Valence Electrons,0.0004540680143394244
+Maximum Unfilled p-Orbital Electrons,0.0004362161890162053
+Deviation in Unfilled s-Orbital Electrons,0.0004054309622138007
+Deviation in s-Valence Electrons,0.00038907906935682873
+Minimum Total Unfilled Orbital Electrons,0.0003778681926246125
+Most Common Periodic Table Group,0.0003489034288951066
+Most Common p-Valence Electrons,0.00031797906348662554
+Range of Periodic Table Group,0.0003074663065493363
+Range of Unfilled s-Orbital Electrons,0.00026662058332311325
+Average Ground-State Magnetic Moment,0.00025090592644454884
+Most Common Unfilled s-Orbital Electrons,0.00021026501541335552
+Maximum Mendeleev Number,0.00017074217760636992
+Maximum Ground-State Band Gap,0.00015639555569222545
+Most Common Total Unfilled Orbital Electrons,0.00015090932711586878
+Minimum Atomic Weight,0.00012544486882559152
+Maximum Unfilled s-Orbital Electrons,0.00010764206081032829
+Most Common Electronegativity,0.0001038606174185788
+Minimum p-Valence Electrons,0.00010300321569684576
+Range of s-Valence Electrons,9.971973536438116e-05
+Minimum Periodic Table Group,9.911687685386308e-05
+Minimum Atomic Number,7.027420215720611e-05
+Minimum d-Valence Electrons,5.97714353933406e-05
+Most Common Atomic Weight,5.8685607651680165e-05
+Maximum Atomic Weight,5.2711698304027453e-05
+Range of p-Valence Electrons,4.918086484152647e-05
+Minimum s-Valence Electrons,4.7581121169011555e-05
+Minimum Periodic Table Period,4.4047494646611994e-05
+Range of Unfilled f-Orbital Electrons,3.915854808715403e-05
+Maximum Ground-State Magnetic Moment,3.8800902931922876e-05
+Range of f-Valence Electrons,3.776606670556249e-05
+Most Common Unfilled d-Orbital Electrons,9.99655645580144e-06
+Range of Unfilled p-Orbital Electrons,6.9659099753025855e-06
+Maximum f-Valence Electrons,2.3742057536155855e-06
+Range of Ground-State Magnetic Moment,2.192197535390122e-06
+Maximum p-Valence Electrons,1.755347539055677e-06
+Most Common Periodic Table Period,0.0
+Minimum f-Valence Electrons,0.0
+Maximum d-Valence Electrons,0.0
+Most Common s-Valence Electrons,0.0
+Maximum s-Valence Electrons,0.0
+Maximum Periodic Table Period,0.0
+Maximum Periodic Table Group,0.0
+Most Common f-Valence Electrons,0.0
+Minimum Unfilled s-Orbital Electrons,0.0
+Minimum Unfilled f-Orbital Electrons,0.0
+Maximum Unfilled f-Orbital Electrons,0.0
+Most Common Unfilled p-Orbital Electrons,0.0
+Minimum Unfilled d-Orbital Electrons,0.0
+Minimum Unfilled p-Orbital Electrons,0.0
+Most Common Unfilled f-Orbital Electrons,0.0
+Minimum Ground-State Band Gap,0.0
+Minimum Ground-State Magnetic Moment,0.0

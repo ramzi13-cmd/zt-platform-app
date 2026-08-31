@@ -1050,7 +1050,7 @@ elif page == "📊  Model Performance":
 elif page == "🔬  Feature Importance":
     import plotly.graph_objects as go
     st.markdown("# Feature Importance (SHAP)")
-    st.markdown('<div class="info-box">SHAP (SHapley Additive exPlanations) values showing which elemental descriptors most strongly drive ZT predictions. Based on XGBoost model trained on random split.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-box">SHAP (SHapley Additive exPlanations) values showing which elemental descriptors most strongly drive ZT predictions. Based on the Gradient Boosting model trained on a random split.</div>', unsafe_allow_html=True)
 
     if shap_df is None:
         st.warning("SHAP importance file not found. Run 04_shap_analysis_random_split.py first to generate shap_feature_importance.csv.")
