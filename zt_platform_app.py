@@ -277,7 +277,6 @@ with st.sidebar:
         "🏠  Overview",
         "🔍  Data Explorer",
         "🤖  ZT Prediction",
-        "⚗️  Composition Screening",
         "📊  Model Performance",
         "🔬  Feature Importance",
         "📰  Research Feed",
@@ -293,7 +292,7 @@ with st.sidebar:
     st.markdown(f"**Dataset:** {n_rows:,} rows")
     st.markdown(f"**Unique compositions:** {n_comps}")
     st.markdown(f"**DOI-linked rows:** {n_dois:,}")
-    if model_loaded: st.markdown("**Model:** Gradient Boosting (R²=0.820) ✅")
+    if model_loaded: st.markdown("**Model:** Gradient Boosting (R²=0.956) ✅")
     else:            st.markdown("**Model:** Not loaded ⚠️")
     st.markdown("---")
     st.markdown("NTNU · Dept. of Mechanical & Industrial Engineering")
@@ -652,7 +651,7 @@ if page == "🏠  Overview":
     for col,(icon,title,desc) in zip([c1,c2,c3],[
         ("🔍","Data Explorer","Browse 3,841 ZT measurements. Filter by composition, ZT range, and temperature."),
         ("🤖","ZT Prediction","Predict ZT for any composition at any temperature using Gradient Boosting + matminer Magpie features."),
-        ("⚗️","Composition Screening","Batch-screen multiple compositions and compare predicted ZT at a fixed temperature."),
+        ("💬","AI Assistant","Agentic RAG chat that predicts ZT, searches literature, and cites sources for grounded answers."),
     ]):
         col.markdown(f'<div style="background:white;border:1px solid #DDE3ED;border-radius:8px;padding:16px;height:120px;"><div style="font-size:1.5rem;">{icon}</div><div style="font-weight:600;color:#1B2A4A;margin-top:4px;">{title}</div><div style="font-size:0.83rem;color:#5A6478;margin-top:4px;">{desc}</div></div>', unsafe_allow_html=True)
 
@@ -874,100 +873,6 @@ elif page == "🤖  ZT Prediction":
                                  font=dict(family='Source Sans 3'), margin=dict(l=200,r=20,t=40,b=40))
             st.plotly_chart(fig_s, use_container_width=True)
 
-# ══════════════════════════════════════════════════════════════
-# PAGE: COMPOSITION SCREENING
-# ══════════════════════════════════════════════════════════════
-elif page == "⚗️  Composition Screening":
-    import plotly.graph_objects as go
-    st.markdown("# Composition Screening")
-    st.markdown('<div class="info-box">Enter multiple compositions to compare predicted ZT at a fixed temperature, or upload a CSV file.</div>', unsafe_allow_html=True)
-
-    if not model_loaded:
-        st.error("Model not loaded."); st.stop()
-
-    c1, c2 = st.columns([3, 1])
-    with c1:
-        manual_input = st.text_area("Compositions (one per line)",
-                                    placeholder="Bi2Te3\nPbTe\nSnSe\nMg3Sb2\nCoSb3",
-                                    height=180)
-    with c2:
-        screen_temp = st.number_input("Temperature (K)", value=600, min_value=50, max_value=1400, step=25)
-        uploaded    = st.file_uploader("Or upload CSV", type=["csv"])
-        screen_btn  = st.button("🔍 Screen All", use_container_width=True)
-
-    if screen_btn:
-        comps_to_screen = []
-        if uploaded:
-            try:
-                df_up = pd.read_csv(uploaded)
-                cc = [c for c in df_up.columns if 'comp' in c.lower() or 'formula' in c.lower() or 'material' in c.lower()]
-                if cc:
-                    comps_to_screen += df_up[cc[0]].dropna().tolist()
-            except Exception as e:
-                st.error(f"Error reading file: {e}")
-        if manual_input.strip():
-            comps_to_screen += [c.strip() for c in manual_input.strip().split('\n') if c.strip()]
-
-        if not comps_to_screen:
-            st.warning("No compositions entered.")
-        else:
-            results = []
-            progress = st.progress(0)
-            for i, comp in enumerate(comps_to_screen):
-                try:
-                    zt = predict_zt(comp, screen_temp)
-                    grade, color, _ = get_zt_grade(zt)
-                    results.append({'Composition': comp, 'Predicted ZT': round(zt, 4),
-                                    'Grade': grade, 'Color': color})
-                except Exception as e:
-                    results.append({'Composition': comp, 'Predicted ZT': None,
-                                    'Grade': 'Error', 'Color': '#718096'})
-                progress.progress((i+1)/len(comps_to_screen))
-
-            results = sorted([r for r in results if r['Predicted ZT'] is not None],
-                             key=lambda x: x['Predicted ZT'], reverse=True)
-
-            st.markdown(f'<div class="section-title">Results at {screen_temp} K — {len(results)} compositions screened</div>', unsafe_allow_html=True)
-
-            # Bar chart
-            fig = go.Figure(go.Bar(
-                x=[r['Composition'] for r in results],
-                y=[r['Predicted ZT'] for r in results],
-                marker_color=[r['Color'] for r in results],
-                text=[f"{r['Predicted ZT']:.3f}" for r in results],
-                textposition='outside',
-            ))
-            for val, label, lcolor in [(1.5,"Outstanding","#22543D"),(1.0,"Excellent","#27AE60"),(0.5,"Good","#F39C12")]:
-                fig.add_hline(y=val, line_dash="dot", line_color=lcolor,
-                              annotation_text=label, annotation_position="right",
-                              annotation_font_size=9)
-            fig.update_layout(title=f"Predicted ZT at {screen_temp} K",
-                              xaxis_title="Composition", yaxis_title="Predicted ZT",
-                              xaxis_tickangle=-35, height=400,
-                              paper_bgcolor='white', plot_bgcolor='#F7F9FC',
-                              font=dict(family='Source Sans 3'), margin=dict(l=40,r=120,t=40,b=80))
-            fig.update_xaxes(gridcolor='#DDE3ED')
-            fig.update_yaxes(gridcolor='#DDE3ED')
-            st.plotly_chart(fig, use_container_width=True)
-
-            # Cards
-            for r in results:
-                st.markdown(
-                    f'<div style="background:#FFF;border:1px solid #DDE3ED;border-radius:8px;padding:12px 18px;'
-                    f'margin-bottom:6px;border-left:4px solid {r["Color"]};">'
-                    f'<div style="display:flex;justify-content:space-between;align-items:center;">'
-                    f'<div style="font-weight:700;color:#1B2A4A;">{r["Composition"]}</div>'
-                    f'<div><span style="font-size:1.2rem;font-weight:700;color:{r["Color"]};">'
-                    f'ZT = {r["Predicted ZT"]:.4f}</span>'
-                    f'<span style="background:{r["Color"]};color:white;font-size:0.72rem;padding:2px 8px;'
-                    f'border-radius:10px;margin-left:8px;">{r["Grade"]}</span></div></div></div>',
-                    unsafe_allow_html=True
-                )
-
-            # Download
-            res_df = pd.DataFrame(results)[['Composition', 'Predicted ZT', 'Grade']]
-            st.download_button("📥 Download results", res_df.to_csv(index=False),
-                               file_name="screening_results.csv", mime="text/csv")
 
 # ══════════════════════════════════════════════════════════════
 # PAGE: MODEL PERFORMANCE
@@ -1666,7 +1571,7 @@ asked for."""
                 st.session_state["_ai_prefill"] = q
                 st.rerun()
 
-    chat_container = st.container(height=500)
+    chat_container = st.container()
     with chat_container:
         for i, (role, text) in enumerate(st.session_state["ai_display"]):
             with st.chat_message(role):
