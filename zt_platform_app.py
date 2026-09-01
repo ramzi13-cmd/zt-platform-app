@@ -715,10 +715,12 @@ if page == "🏠  Overview":
 elif page == "🔍  Data Explorer":
     import plotly.graph_objects as go
     st.markdown("# Data Explorer")
-    st.markdown('<div class="info-box">Browse 3,841 ZT measurements from 314 unique compositions. Search by composition or element, filter by temperature and ZT range.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="info-box">Browse 3,841 ZT measurements from 314 unique compositions. Search by composition or element, filter by temperature, ZT range, and publication year.</div>', unsafe_allow_html=True)
 
     if df is None:
         st.error("Dataset not loaded."); st.stop()
+
+    has_year = 'Publication_Year' in df.columns
 
     c1,c2,c3,c4 = st.columns(4)
     with c1: search = st.text_input("Search composition", placeholder="e.g. Bi2Te3, PbTe, Mg")
@@ -726,31 +728,71 @@ elif page == "🔍  Data Explorer":
     with c3: zt_max = st.number_input("Max ZT", value=3.0, min_value=0.0, max_value=3.0, step=0.1)
     with c4: temp_filter = st.slider("Temperature range (K)", 0, 1400, (0, 1400))
 
+    if has_year:
+        year_series = df['Publication_Year'].dropna()
+        if len(year_series) > 0:
+            year_min_data, year_max_data = int(year_series.min()), int(year_series.max())
+            year_filter = st.slider("Publication year range", year_min_data, year_max_data,
+                                     (year_min_data, year_max_data))
+        else:
+            year_filter = None
+    else:
+        year_filter = None
+        st.caption("ℹ️ Publication year data not available — run 20_add_publication_year_to_main_dataset.py to enable this filter.")
+
     df_exp = df.copy()
     if search:
         df_exp = df_exp[df_exp['Composition'].str.contains(search, case=False, na=False)]
     df_exp = df_exp[(df_exp['ZT'] >= zt_min) & (df_exp['ZT'] <= zt_max)]
     df_exp = df_exp[(df_exp['Temperature (K)'] >= temp_filter[0]) & (df_exp['Temperature (K)'] <= temp_filter[1])]
+    if has_year and year_filter is not None:
+        # Rows with no known year are excluded once a year filter is actively narrowed,
+        # but included by default when the slider covers the full range (nothing to hide)
+        full_range = (year_filter[0] == year_min_data and year_filter[1] == year_max_data)
+        if full_range:
+            df_exp = df_exp[(df_exp['Publication_Year'].isna()) |
+                            ((df_exp['Publication_Year'] >= year_filter[0]) & (df_exp['Publication_Year'] <= year_filter[1]))]
+        else:
+            df_exp = df_exp[(df_exp['Publication_Year'] >= year_filter[0]) & (df_exp['Publication_Year'] <= year_filter[1])]
 
     st.markdown(f'<div class="info-box">Showing <b>{len(df_exp):,}</b> rows · <b>{df_exp["Composition"].nunique()}</b> unique compositions</div>', unsafe_allow_html=True)
 
-    # ZT vs T for filtered compositions
-    if len(df_exp) > 0 and df_exp['Composition'].nunique() <= 20:
-        fig = go.Figure()
-        for comp, grp in df_exp.groupby('Composition'):
-            grp = grp.sort_values('Temperature (K)')
-            fig.add_trace(go.Scatter(x=grp['Temperature (K)'], y=grp['ZT'], mode='lines+markers',
-                                     name=comp, marker=dict(size=5),
-                                     hovertemplate=f'<b>{comp}</b><br>T=%{{x:.0f}} K<br>ZT=%{{y:.3f}}<extra></extra>'))
-        fig.update_layout(title="ZT vs Temperature", xaxis_title="Temperature (K)", yaxis_title="ZT",
-                          height=400, paper_bgcolor='white', plot_bgcolor='#F7F9FC',
-                          font=dict(family='Source Sans 3'), margin=dict(l=40,r=20,t=40,b=40))
+    # ZT vs T — per-composition lines when few compositions match, otherwise a
+    # scatter colored by publication year (or by ZT if year isn't available)
+    if len(df_exp) > 0:
+        if df_exp['Composition'].nunique() <= 20:
+            fig = go.Figure()
+            for comp, grp in df_exp.groupby('Composition'):
+                grp = grp.sort_values('Temperature (K)')
+                fig.add_trace(go.Scatter(x=grp['Temperature (K)'], y=grp['ZT'], mode='lines+markers',
+                                         name=comp, marker=dict(size=5),
+                                         hovertemplate=f'<b>{comp}</b><br>T=%{{x:.0f}} K<br>ZT=%{{y:.3f}}<extra></extra>'))
+            fig.update_layout(title="ZT vs Temperature", xaxis_title="Temperature (K)", yaxis_title="ZT",
+                              height=400, paper_bgcolor='white', plot_bgcolor='#F7F9FC',
+                              font=dict(family='Source Sans 3'), margin=dict(l=40,r=20,t=40,b=40))
+        else:
+            color_col = 'Publication_Year' if has_year else 'ZT'
+            color_label = 'Publication Year' if has_year else 'ZT'
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(
+                x=df_exp['Temperature (K)'], y=df_exp['ZT'], mode='markers',
+                marker=dict(color=df_exp[color_col], colorscale='Viridis', size=5, opacity=0.6,
+                            colorbar=dict(title=color_label)),
+                hovertemplate='<b>%{text}</b><br>T=%{x:.0f} K<br>ZT=%{y:.3f}<extra></extra>',
+                text=df_exp['Composition']
+            ))
+            fig.update_layout(title=f"ZT vs Temperature (colored by {color_label.lower()})",
+                              xaxis_title="Temperature (K)", yaxis_title="ZT",
+                              height=400, paper_bgcolor='white', plot_bgcolor='#F7F9FC',
+                              font=dict(family='Source Sans 3'), margin=dict(l=40,r=20,t=40,b=40))
         fig.update_xaxes(gridcolor='#DDE3ED')
         fig.update_yaxes(gridcolor='#DDE3ED')
         st.plotly_chart(fig, use_container_width=True)
 
     # Table
     show_cols = ['Composition', 'ZT', 'Temperature (K)', 'DOI']
+    if has_year:
+        show_cols.append('Publication_Year')
     st.dataframe(df_exp[show_cols].reset_index(drop=True), use_container_width=True, height=400)
 
     # Download
