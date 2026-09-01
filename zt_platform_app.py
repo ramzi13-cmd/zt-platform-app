@@ -740,7 +740,11 @@ elif page == "🔍  Data Explorer":
         year_filter = None
         st.caption("ℹ️ Publication year data not available — run 20_add_publication_year_to_main_dataset.py to enable this filter.")
 
+    hide_no_doi = st.checkbox("Hide entries without a linked publication (DOI)", value=True)
+
     df_exp = df.copy()
+    if hide_no_doi:
+        df_exp = df_exp[df_exp['DOI'].notna()]
     if search:
         df_exp = df_exp[df_exp['Composition'].str.contains(search, case=False, na=False)]
     df_exp = df_exp[(df_exp['ZT'] >= zt_min) & (df_exp['ZT'] <= zt_max)]
