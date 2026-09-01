@@ -742,9 +742,19 @@ elif page == "🔍  Data Explorer":
 
     hide_no_doi = st.checkbox("Hide entries without a linked publication (DOI)", value=True)
 
+    has_journal = 'Journal_Name' in df.columns
+    journal_filter = None
+    if has_journal:
+        journal_options = sorted(df['Journal_Name'].dropna().unique().tolist())
+        journal_filter = st.multiselect("Filter by journal (leave empty to include all)", journal_options)
+    else:
+        st.caption("ℹ️ Journal data not available — run 21_add_journal_to_main_dataset.py to enable this filter.")
+
     df_exp = df.copy()
     if hide_no_doi:
         df_exp = df_exp[df_exp['DOI'].notna()]
+    if has_journal and journal_filter:
+        df_exp = df_exp[df_exp['Journal_Name'].isin(journal_filter)]
     if search:
         df_exp = df_exp[df_exp['Composition'].str.contains(search, case=False, na=False)]
     df_exp = df_exp[(df_exp['ZT'] >= zt_min) & (df_exp['ZT'] <= zt_max)]
@@ -795,6 +805,8 @@ elif page == "🔍  Data Explorer":
 
     # Table
     show_cols = ['Composition', 'ZT', 'Temperature (K)', 'DOI']
+    if has_journal:
+        show_cols.append('Journal_Name')
     if has_year:
         show_cols.append('Publication_Year')
     st.dataframe(df_exp[show_cols].reset_index(drop=True), use_container_width=True, height=400)
