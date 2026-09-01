@@ -10,6 +10,6 @@ pymatgen
 scikit-learn
 supabase
 python-dotenv
-chromadb==0.4.24
+chromadb
 sentence-transformers==2.7.0
 transformers==4.45.2
