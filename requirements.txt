@@ -1,3 +1,4 @@
+setuptools
 streamlit
 pandas
 numpy
@@ -8,6 +9,6 @@ matminer
 pymatgen
 chromadb
 sentence-transformers
-xgboost
+scikit-learn
 supabase
 python-dotenv
