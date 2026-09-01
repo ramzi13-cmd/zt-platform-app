@@ -1,15 +1,29 @@
-setuptools
-streamlit
-pandas
-numpy
-joblib
-requests
-plotly
-matminer
-pymatgen
-scikit-learn
-supabase
-python-dotenv
-chromadb
-sentence-transformers==2.7.0
-transformers==4.45.2
+# ─────────────────────────────────────────────────────────────────────────────
+# Verified to install cleanly together (pip check clean, no conflicts) and to
+# run the app end-to-end: model unpickles, ChromaDB reads chroma_db/, and
+# SentenceTransformer('all-MiniLM-L6-v2') encodes queries.
+#
+# MUST be paired with runtime.txt pinning Python to 3.12.
+# Root cause of the previous deploy failures: Streamlit Cloud was building on
+# Python 3.14, which has no wheels for pymatgen / matminer / chromadb /
+# onnxruntime / torch. pip then backtracked through the whole graph looking for
+# something installable and landed on ancient releases (transformers 4.30.2,
+# etc.), producing the "unsolvable conflict" errors. Pinning Python fixes it;
+# chasing pip version pins on 3.14 cannot.
+# ─────────────────────────────────────────────────────────────────────────────
+
+setuptools<81              # keeps pkg_resources importable (removed in setuptools 81+)
+streamlit==1.62.0
+pandas==2.3.3
+numpy==2.5.2
+joblib==1.6.0
+requests==2.34.2
+plotly==7.0.0
+matminer==0.10.1
+pymatgen==2026.5.4
+scikit-learn==1.8.0        # must match the version the deployed .pkl models were trained with
+supabase==2.31.0
+python-dotenv==1.2.3
+chromadb==1.5.9
+sentence-transformers==6.0.1
+transformers==5.16.1
